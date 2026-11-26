@@ -1,7 +1,7 @@
 import { apiClient } from './api';
 
 export async function downloadDataset(format: 'json' | 'csv'): Promise<void> {
-  const response = await apiClient.get('/dataset/export', {
+  const response = await apiClient.get<Blob>('/dataset/export', {
     params: { format },
     responseType: 'blob',
   });
