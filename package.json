@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "PROMETHEUS-X — Industrial Defect Intelligence, Model Reliability & 3D Counterfactual Factory Twin Platform",
   "type": "module",
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "scripts": {
     "dev": "tsx server.ts",
     "start": "node server.ts",

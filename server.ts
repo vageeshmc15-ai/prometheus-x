@@ -78,12 +78,18 @@ async function startServer() {
   );
 
   // Strict CORS origin allowlist (never wildcard on authenticated routes)
-  let appOrigin: string | null = null;
-  if (process.env.APP_URL) {
+  const allowedOrigins = new Set<string>();
+  const rawOrigins = [
+    process.env.APP_URL,
+    process.env.RENDER_EXTERNAL_URL,
+    process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : undefined,
+  ];
+  for (const raw of rawOrigins) {
+    if (!raw) continue;
     try {
-      appOrigin = new URL(process.env.APP_URL).origin;
+      allowedOrigins.add(new URL(raw).origin);
     } catch {
-      appOrigin = null;
+      // ignore malformed URL env vars
     }
   }
   app.use(
@@ -98,8 +104,10 @@ async function startServer() {
           const isLocal =
             parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
           const isAllowedHost =
-            (appOrigin && origin === appOrigin) ||
+            allowedOrigins.has(origin) ||
             parsed.hostname.endsWith('.run.app') ||
+            parsed.hostname.endsWith('.onrender.com') ||
+            parsed.hostname.endsWith('.up.railway.app') ||
             isLocal;
           if (isAllowedHost) {
             callback(null, true);

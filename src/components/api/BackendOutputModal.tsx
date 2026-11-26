@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Check, Copy, Download, RefreshCw, Server } from 'lucide-react';
-import { apiClient, extractApiError } from '../../lib/api';
+import { API_BASE_URL, apiClient, extractApiError } from '../../lib/api';
 import { downloadDatasetFile, type DatasetExportFormat } from '../../lib/dataset-export';
 import { useAuth } from '../../context/AuthContext';
 import { Button, Dialog } from '../ui/primitives';
@@ -10,12 +10,11 @@ interface EndpointDef {
   method: 'GET';
   path: string;
   label: string;
-  publicRoute?: boolean;
   adminOnly?: boolean;
 }
 
 const ENDPOINTS: EndpointDef[] = [
-  { id: 'health', method: 'GET', path: '/api/health', label: 'Health & DB', publicRoute: true },
+  { id: 'health', method: 'GET', path: '/health', label: 'Health & DB' },
   { id: 'factories', method: 'GET', path: '/factories', label: 'Factories' },
   { id: 'inspections', method: 'GET', path: '/inspections', label: 'Inspections' },
   { id: 'maintenance', method: 'GET', path: '/maintenance', label: 'Maintenance' },
@@ -52,18 +51,10 @@ export function BackendOutputModal({
     setError(null);
     const start = performance.now();
     try {
-      if (ep.publicRoute) {
-        const res = await fetch(ep.path);
-        const json = await res.json();
-        setStatusCode(res.status);
-        setLatencyMs(Math.round(performance.now() - start));
-        setPayloadText(JSON.stringify(json, null, 2));
-      } else {
-        const res = await apiClient.get(ep.path);
-        setStatusCode(res.status);
-        setLatencyMs(Math.round(performance.now() - start));
-        setPayloadText(JSON.stringify(res.data, null, 2));
-      }
+      const res = await apiClient.get(ep.path);
+      setStatusCode(res.status);
+      setLatencyMs(Math.round(performance.now() - start));
+      setPayloadText(JSON.stringify(res.data, null, 2));
     } catch (err) {
       setStatusCode(null);
       setLatencyMs(Math.round(performance.now() - start));
@@ -102,9 +93,7 @@ export function BackendOutputModal({
     }
   };
 
-  const displayUrl = activeEndpoint.publicRoute
-    ? activeEndpoint.path
-    : `/api${activeEndpoint.path}`;
+  const displayUrl = `${API_BASE_URL}${activeEndpoint.path}`;
 
   return (
     <Dialog

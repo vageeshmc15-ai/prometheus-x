@@ -1,0 +1,25 @@
+databases:
+  - name: prometheus-x-db
+    plan: free
+    databaseName: prometheus_x
+    user: prometheus_x_user
+
+services:
+  - type: web
+    name: prometheus-x
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npx drizzle-kit push --config=src/db/drizzle.config.ts --force && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22.14.0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: prometheus-x-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
