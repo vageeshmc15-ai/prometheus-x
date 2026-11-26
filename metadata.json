@@ -1,0 +1,6 @@
+{
+  "name": "PROMETHEUS-X",
+  "description": "Industrial Defect Intelligence, Self-Challenging AI Reliability, Cross-Factory Analytics, and Counterfactual Factory Twin Platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
